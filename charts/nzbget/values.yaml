@@ -287,9 +287,9 @@ livenessProbe:
   ## @param livenessProbe.periodSeconds Period seconds for livenessProbe
   periodSeconds: 10
   ## @param livenessProbe.timeoutSeconds Timeout seconds for livenessProbe
-  timeoutSeconds: 1
+  timeoutSeconds: 2
   ## @param livenessProbe.failureThreshold Failure threshold for livenessProbe
-  failureThreshold: 3
+  failureThreshold: 6
   ## @param livenessProbe.successThreshold Success threshold for livenessProbe
   successThreshold: 1
 
