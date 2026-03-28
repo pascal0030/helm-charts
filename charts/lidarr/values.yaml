@@ -302,3 +302,22 @@ affinity: {}
 
 ## @param extraObjects Array of extra objects to deploy with the release
 extraObjects: []
+
+initContainers: []
+# - name: init-myservice
+#   image:
+#     registry: docker.io
+#     repository: busybox
+#     tag: latest
+#     imagePullPolicy: IfNotPresent
+# # env:
+# #   - name: ENV_VAR_NAME
+# #     value: ENV_VAR_VALUE
+#   command: ["sh", "-c", "mkdir -p /downloads/music"]
+#   resources:
+#     limits:
+#       memory: 64Mi
+#       cpu: 50m
+#     requests:
+#       cpu: 50m
+#       memory: 64Mi

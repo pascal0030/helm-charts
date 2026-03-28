@@ -26,11 +26,26 @@
         "imagePullPolicy": { "type": "string" }
       }
     },
+    "auth": {
+      "type": "object",
+      "properties": {
+        "saEnabled": { "type": "boolean" },
+        "authenticationMethod": { "type": "string" },
+        "AuthenticationRequired": { "type": "string" },
+        "apiKey": { "type": "string" },
+        "existingSecret": {
+          "type": "object",
+          "properties": {
+            "secretName": { "type": "string" },
+            "secretKey": { "type": "string" }
+          }
+        }
+      }
+    },
     "config": {
       "type": "object",
       "properties": {
-        "sidecarContainer": { "type": "boolean" },
-        "secretName": { "type": "string" }
+        "logLevel": { "type": "string" }
       }
     },
     "service": {
@@ -257,34 +272,47 @@
             "imagePullPolicy": { "type": "string" }
           }
         },
-        "apiKey": { "type": "string" },
-        "serviceMonitor": {
-          "type": "object",
-          "properties": {
-            "enabled": { "type": "boolean" },
-            "interval": { "type": "string" },
-            "scrapeTimeout": { "type": "string" },
-            "labels": { "type": "object" },
-            "metricRelabelings": {
-              "type": "array",
-              "items": { "type": "object" }
-            },
-            "relabelings": {
-              "type": "array",
-              "items": { "type": "object" }
-            }
-          }
+        "containerPort": { "type": "integer" },
+        "resources": { "type": "object" },
+        "extraArgs": {
+          "type": "array",
+          "items": { "type": "string" }
         },
         "service": {
           "type": "object",
           "properties": {
             "port": { "type": "integer" },
-            "interval": { "type": "string" },
-            "annotations": { "type": "object" }
+            "annotations": { "type": "object" },
+            "loadBalancerIP": { "type": "string" },
+            "loadBalancerSourceRanges": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "clusterIP": { "type": "string" },
+            "nodePort": { "type": "string" }
           }
         },
-        "containerPort": { "type": "integer" },
-        "resources": { "type": "object" }
+        "serviceMonitor": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "namespace": { "type": "string" },
+            "interval": { "type": "string" },
+            "scrapeTimeout": { "type": "string" },
+            "relabelings": {
+              "type": "array",
+              "items": { "type": "object" }
+            },
+            "metricRelabelings": {
+              "type": "array",
+              "items": { "type": "object" }
+            },
+            "honorLabels": { "type": "boolean" },
+            "selector": { "type": "object" },
+            "annotations": { "type": "object" },
+            "namespaceSelector": { "type": "object" }
+          }
+        }
       }
     },
     "podAnnotations": { "type": "object" },
@@ -296,6 +324,10 @@
     },
     "affinity": { "type": "object" },
     "extraObjects": {
+      "type": "array",
+      "items": { "type": "object" }
+    },
+    "initContainers": {
       "type": "array",
       "items": { "type": "object" }
     }

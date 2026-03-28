@@ -39,6 +39,38 @@ spec:
       {{- if .Values.config.saEnabled }}
       serviceAccountName: {{ include "radarr.fullname" . }}-sa
       {{- end }}
+      {{- if .Values.initContainers }}
+      initContainers:
+        {{- range $initContainer := .Values.initContainers }}
+        - name: {{ $initContainer.name }}
+          image: {{ $initContainer.image.registry }}/{{ $initContainer.image.repository }}:{{ $initContainer.image.tag }}
+          imagePullPolicy: {{ $initContainer.image.imagePullPolicy }}
+          {{- if $initContainer.env }}
+          env:
+            {{- toYaml $initContainer.env | nindent 12 }}
+          {{- end }}
+          command: {{- toYaml $initContainer.command | nindent 12 }}
+          {{- if $initContainer.resources }}
+          resources:
+            {{- toYaml $initContainer.resources | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: config
+              mountPath: /config
+            {{- if $.Values.extraVolumes }}
+            {{- range $storage := $.Values.extraVolumes }}
+            - name: {{ $storage.name }}
+              mountPath: {{ $storage.mountPath }}
+            {{- end }}
+            {{- end }}
+            {{- if $.Values.nfsVolumes }}
+            {{- range $nfsstorage := $.Values.nfsVolumes }}
+            - name: {{ $nfsstorage.name }}
+              mountPath: {{ $nfsstorage.mountPath }}
+            {{- end }}
+            {{- end }}
+        {{- end }}
+      {{- end }}
       containers:
         - name: radarr
           image: {{ include "radarr.image" . }}

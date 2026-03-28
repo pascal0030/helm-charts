@@ -295,6 +295,10 @@
       "items": { "type": "object" }
     },
     "affinity": { "type": "object" },
+    "initContainers": {
+      "type": "array",
+      "items": { "type": "object" }
+    },
     "extraObjects": {
       "type": "array",
       "items": { "type": "object" }
