@@ -36,6 +36,7 @@ spec:
       {{- if .Values.podSecurityContext.enabled }}
       securityContext:
         fsGroup: {{ .Values.podSecurityContext.fsGroup }}
+        fsGroupChangePolicy: {{ .Values.podSecurityContext.fsGroupChangePolicy }}
       {{- end }}
       initContainers:
         - name: copy-nzbget-config

@@ -404,6 +404,8 @@ podSecurityContext:
   enabled: true
   ## @param podSecurityContext.fsGroup Set bazarr pod's Security Context fsGroup
   fsGroup: 1000
+  ## @param podSecurityContext.fsGroupChangePolicy Set bazarr pod's Security Context fsGroupChangePolicy
+  fsGroupChangePolicy: "OnRootMismatch"  # only chown if root dir ownership is wrong
 
 ## @section Container Security Context
 containerSecurityContext:

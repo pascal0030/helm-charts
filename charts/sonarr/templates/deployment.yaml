@@ -35,6 +35,7 @@ spec:
       {{- if .Values.podSecurityContext.enabled }}
       securityContext:
         fsGroup: {{ .Values.podSecurityContext.fsGroup }}
+        fsGroupChangePolicy: {{ .Values.podSecurityContext.fsGroupChangePolicy }}
       {{- end }}
       {{- if .Values.config.saEnabled }}
       serviceAccountName: {{ include "sonarr.fullname" . }}-sa
