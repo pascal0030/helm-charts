@@ -24,7 +24,7 @@ image:
   ## @param image.tag sonarr image tag (immutable tags are recommended)
   tag: "latest"
   ## @param image.pullPolicy sonarr image pull policy
-  imagePullPolicy: Always
+  imagePullPolicy: IfNotPresent
 
 ## @section Sonarr Authentication parameters
 auth:

@@ -24,7 +24,7 @@ image:
   ## @param image.tag radarr image tag (immutable tags are recommended)
   tag: "latest"
   ## @param image.pullPolicy radarr image pull policy
-  imagePullPolicy: Always
+  imagePullPolicy: IfNotPresent
 
 ## @section Radarr Authentication parameters
 auth:

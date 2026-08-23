@@ -24,7 +24,7 @@ image:
   ## @param image.tag NZBGet image tag (immutable tags are recommended)
   tag: "latest"
   ## @param image.pullPolicy NZBGet image pull policy
-  imagePullPolicy: Always
+  imagePullPolicy: IfNotPresent
 
 ## @section NZBGet Authentication parameters
 auth:
