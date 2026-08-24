@@ -570,8 +570,7 @@ metrics:
   ## @param metrics.image.pullPolicy Redis exporter image pull policy
   image:
     ## @param metrics.image Docker image for the bazarr metrics exporter
-    registry: ghcr.io
-    repository: onedr0p/exportarr
+    name: ghcr.io/onedr0p/exportarr
     tag: v2.3 # https://github.com/onedr0p/exportarr/pkgs/container/exportarr
     imagePullPolicy: IfNotPresent
   ## @param metrics.containerPort Port where the metrics exporter will listen on

@@ -382,8 +382,7 @@ metrics:
   ## @param metrics.image.pullPolicy Redis exporter image pull policy
   image:
     ## @param metrics.image Docker image for the lidarr metrics exporter
-    registry: ghcr.io
-    repository: frebib/nzbget-exporter
+    name: ghcr.io/frebib/nzbget-exporter
     tag: latest # https://github.com/frebib/nzbget-exporter/pkgs/container/nzbget-exporter
     imagePullPolicy: IfNotPresent
   ## @param metrics.containerPort Port where the metrics exporter will listen on
