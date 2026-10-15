@@ -685,6 +685,22 @@ entries:
   nzbget:
   - apiVersion: v2
     appVersion: 25.3.20250926
+    created: "2026-10-15T15:58:31.36028893Z"
+    dependencies:
+    - name: common
+      repository: https://pascal0030.github.io/helm-charts/
+      version: 1.x.x
+    description: NZBGet is a lightweight and efficient Usenet downloader
+    digest: 650b986650967dc2d158d7db1495e9a14d2a9472bbe89557be93c14004cc7733
+    name: nzbget
+    sources:
+    - https://hub.docker.com/r/linuxserver/nzbget
+    type: application
+    urls:
+    - nzbget-0.1.2.tgz
+    version: 0.1.2
+  - apiVersion: v2
+    appVersion: 25.3.20250926
     created: "2026-10-10T13:18:00.446790349Z"
     dependencies:
     - name: common
@@ -1781,4 +1797,4 @@ entries:
     urls:
     - sonarr-0.0.1.tgz
     version: 0.0.1
-generated: "2026-10-10T13:18:00.4469656Z"
+generated: "2026-10-15T15:58:31.360824005Z"
