@@ -1,0 +1,15 @@
+apiVersion: v2
+name: infinidysk
+description: infinidysk is a Usenet-backed virtual filesystem with a SABnzbd-compatible API, a FUSE mount and WebDAV
+type: application
+version: 0.1.0
+appVersion: "2.0.0-beta.11"
+
+sources:
+  - https://github.com/infinidysk/infinidysk
+  - https://github.com/infinidysk/infinidysk/pkgs/container/infinidysk-next
+
+dependencies:
+  - name: common
+    version: 1.x.x
+    repository: "https://pascal0030.github.io/helm-charts/"

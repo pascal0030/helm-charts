@@ -1,0 +1,9 @@
+{{- if .Values.auth.saEnabled }}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "infinidysk.fullname" . }}-sa
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "infinidysk.labels" . | nindent 4 }}
+{{- end }}

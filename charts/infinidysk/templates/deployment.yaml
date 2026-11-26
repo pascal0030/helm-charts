@@ -1,0 +1,210 @@
+{{- include "infinidysk.validateValues" . }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "infinidysk.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "infinidysk.labels" . | nindent 4 }}
+  {{- with .Values.commonAnnotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  replicas: 1
+  revisionHistoryLimit: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      {{- include "infinidysk.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "infinidysk.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
+{{- with (include "infinidysk.imagePullSecrets" .) }}
+{{- . | nindent 6 }}
+{{- end }}
+      {{- if .Values.podSecurityContext.enabled }}
+      securityContext:
+        fsGroup: {{ .Values.podSecurityContext.fsGroup }}
+        fsGroupChangePolicy: {{ .Values.podSecurityContext.fsGroupChangePolicy }}
+      {{- end }}
+      {{- if .Values.auth.saEnabled }}
+      serviceAccountName: {{ include "infinidysk.fullname" . }}-sa
+      {{- end }}
+      terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
+      {{- with .Values.initContainers }}
+      initContainers:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: infinidysk
+          image: {{ include "infinidysk.image" . }}
+          imagePullPolicy: {{ .Values.image.imagePullPolicy }}
+          securityContext: {{- toYaml .Values.containerSecurityContext | nindent 12 }}
+          env:
+            - name: INFINIDYSK_LISTEN
+              value: "0.0.0.0:{{ .Values.service.port }}"
+            - name: TZ
+              value: {{ .Values.config.timezone | quote }}
+            - name: PUID
+              value: {{ .Values.config.puid | quote }}
+            - name: PGID
+              value: {{ .Values.config.pgid | quote }}
+            - name: RUST_LOG
+              value: {{ .Values.config.logLevel | quote }}
+            {{- if .Values.config.database.existingSecret }}
+            - name: INFINIDYSK_DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.config.database.existingSecret }}
+                  key: {{ .Values.config.database.existingSecretKey }}
+            {{- end }}
+            {{- include "infinidysk.settingsEnv" . | trim | nindent 12 }}
+            {{- with .Values.env }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          {{- if or (include "infinidysk.createSecret" .) .Values.auth.existingSecret .Values.config.useExternalSecret }}
+          envFrom:
+            {{- if include "infinidysk.createSecret" . }}
+            - secretRef:
+                name: {{ include "infinidysk.fullname" . }}
+            {{- end }}
+            {{- with .Values.auth.existingSecret }}
+            - secretRef:
+                name: {{ . }}
+            {{- end }}
+            {{- if .Values.config.useExternalSecret }}
+            - secretRef:
+                name: {{ include "infinidysk.fullname" . }}-config
+            {{- end }}
+          {{- end }}
+          ports:
+            - name: infinidysk-http
+              containerPort: {{ .Values.service.port | default 3000 }}
+              protocol: TCP
+          {{- if .Values.livenessProbe.enabled }}
+          livenessProbe:
+            {{- $probe := merge (omit .Values.livenessProbe "enabled") (dict "httpGet" (dict "port" (.Values.service.port | default 3000) "path" "/healthz")) }}
+            {{- $probe | toYaml | nindent 12 }}
+          {{- end }}
+          {{- if .Values.readinessProbe.enabled }}
+          readinessProbe:
+            {{- $probe := merge (omit .Values.readinessProbe "enabled") (dict "httpGet" (dict "port" (.Values.service.port | default 3000) "path" "/healthz")) }}
+            {{- $probe | toYaml | nindent 12 }}
+          {{- end }}
+          {{- if .Values.startupProbe.enabled }}
+          startupProbe:
+            {{- $probe := merge (omit .Values.startupProbe "enabled") (dict "httpGet" (dict "port" (.Values.service.port | default 3000) "path" "/healthz")) }}
+            {{- $probe | toYaml | nindent 12 }}
+          {{- end }}
+          {{- if .Values.resources }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: config
+              mountPath: /config
+            {{- if .Values.mount.fuse }}
+            - name: dev-fuse
+              mountPath: {{ .Values.mount.devFusePath }}
+            {{- if .Values.mount.bdi.enabled }}
+            - name: sys-bdi
+              mountPath: {{ .Values.mount.bdi.path }}
+            {{- end }}
+            {{- if .Values.mount.hostPath.enabled }}
+            - name: host-mount
+              mountPath: {{ .Values.mount.hostPath.mountPath }}
+              mountPropagation: {{ .Values.mount.hostPath.mountPropagation }}
+            {{- end }}
+            {{- end }}
+            {{- range $storage := .Values.extraVolumes }}
+            - name: {{ $storage.name }}
+              mountPath: {{ $storage.mountPath }}
+            {{- end }}
+            {{- range $nfsstorage := .Values.nfsVolumes }}
+            - name: {{ $nfsstorage.name }}
+              mountPath: {{ $nfsstorage.mountPath }}
+            {{- end }}
+            {{- range $configMap := .Values.extraConfigMaps }}
+            - name: {{ $configMap.name }}
+              mountPath: {{ $configMap.mountPath }}
+              subPath: {{ $configMap.subPath }}
+            {{- end }}
+            {{- range $secret := .Values.extraSecrets }}
+            - name: {{ $secret.name }}
+              mountPath: {{ $secret.mountPath }}
+              subPath: {{ $secret.subPath }}
+            {{- end }}
+      volumes:
+        {{- if .Values.persistence.enabled }}
+        - name: config
+          persistentVolumeClaim:
+            claimName: {{ include "infinidysk.fullname" . }}-pvc
+        {{- else }}
+        - name: config
+          emptyDir: {}
+        {{- end }}
+        {{- if .Values.mount.fuse }}
+        - name: dev-fuse
+          hostPath:
+            path: {{ .Values.mount.devFusePath }}
+            type: CharDevice
+        {{- if .Values.mount.bdi.enabled }}
+        - name: sys-bdi
+          hostPath:
+            path: {{ .Values.mount.bdi.path }}
+            type: Directory
+        {{- end }}
+        {{- if .Values.mount.hostPath.enabled }}
+        - name: host-mount
+          hostPath:
+            path: {{ .Values.mount.hostPath.path }}
+            type: DirectoryOrCreate
+        {{- end }}
+        {{- end }}
+        {{- range $storage := .Values.extraVolumes }}
+        - name: {{ $storage.name }}
+          persistentVolumeClaim:
+            claimName: {{ $storage.pvcName }}
+        {{- end }}
+        {{- range $nfsstorage := .Values.nfsVolumes }}
+        - name: {{ $nfsstorage.name }}
+          nfs:
+            server: {{ $nfsstorage.nfs.server }}
+            path: {{ $nfsstorage.nfs.path }}
+        {{- end }}
+        {{- range $configMap := .Values.extraConfigMaps }}
+        - name: {{ $configMap.name }}
+          configMap:
+            name: {{ $configMap.configMapName }}
+        {{- end }}
+        {{- range $secret := .Values.extraSecrets }}
+        - name: {{ $secret.name }}
+          secret:
+            secretName: {{ $secret.secretName }}
+            items:
+              - key: {{ $secret.key }}
+                path: {{ $secret.path }}
+        {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
