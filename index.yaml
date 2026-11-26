@@ -457,6 +457,25 @@ entries:
     urls:
     - common-1.1.1.tgz
     version: 1.1.1
+  infinidysk:
+  - apiVersion: v2
+    appVersion: 2.0.0-beta.11
+    created: "2026-11-26T18:23:02.871688889Z"
+    dependencies:
+    - name: common
+      repository: https://pascal0030.github.io/helm-charts/
+      version: 1.x.x
+    description: infinidysk is a Usenet-backed virtual filesystem with a SABnzbd-compatible
+      API, a FUSE mount and WebDAV
+    digest: 7de13c76f92d591a3a3c78d495cf72049d045ab20e475ee30f0f9ad77b00ab35
+    name: infinidysk
+    sources:
+    - https://github.com/infinidysk/infinidysk
+    - https://github.com/infinidysk/infinidysk/pkgs/container/infinidysk-next
+    type: application
+    urls:
+    - infinidysk-0.1.0.tgz
+    version: 0.1.0
   lidarr:
   - apiVersion: v2
     appVersion: 25.3.20250926
@@ -1797,4 +1816,4 @@ entries:
     urls:
     - sonarr-0.0.1.tgz
     version: 0.0.1
-generated: "2026-10-15T15:58:31.360824005Z"
+generated: "2026-11-26T18:23:02.871954965Z"
